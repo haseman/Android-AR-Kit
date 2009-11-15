@@ -22,7 +22,7 @@ import android.view.View;
 public class ARLayout extends View implements LocationListener, SensorEventListener
 {
 	
-	private final float xAngleWidth = 33;
+	private final float xAngleWidth = 29;
 	private final float yAngleWidth = 19;
 	
 	public float screenWidth = 480;
@@ -87,6 +87,7 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 	public void onSensorChanged(SensorEvent evt)
 	{
 		float vals[] = evt.values;
+		float localDirection;
 		if(evt.sensor.getType() == Sensor.TYPE_ORIENTATION)
 		{
 			float tmp = vals[0];
@@ -97,12 +98,14 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 			direction =(float) ((tmp * kFilteringFactor) + (direction * (1.0 - kFilteringFactor)));
 			//direction = direction-90;
 			if(direction < 0)
-				direction = 360+direction;
+				localDirection = 360+direction;
+			else
+				localDirection = direction;
 		    
 		    if(locationChanged)
-		    	updateLayouts(direction, (float)inclination, curLocation);
+		    	updateLayouts(localDirection, (float)inclination, curLocation);
 		    else
-		    	updateLayouts(direction, (float)inclination, null);
+		    	updateLayouts(localDirection, (float)inclination, null);
 		}
 		if(evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
 		{
@@ -130,11 +133,15 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 				inclination = inclination -90;
 			
 		}
+		if(direction < 0)
+			localDirection = 360+direction;
+		else
+			localDirection = direction;
 		
 		if(locationChanged)
-	    	updateLayouts(direction+90, (float)inclination, curLocation);
+	    	updateLayouts(localDirection, (float)inclination, curLocation);
 	    else
-	    	updateLayouts(direction, (float)inclination, null);
+	    	updateLayouts(localDirection, (float)inclination, null);
 		
 		postInvalidate();
 	}
@@ -205,7 +212,7 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 	private float calcYvalue(float lowerArm, float upperArm, float inc)
 	{
 		//distance in degress to the lower arm
-		float offset = Math.abs(inc - lowerArm);
+		float offset = ((upperArm - yAngleWidth) - inc) * -1;
 		return screenHeight - ((offset/yAngleWidth) * screenHeight);
 	}
 	public void onDraw(Canvas c)
@@ -225,8 +232,8 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 		while(e.hasMoreElements())
 		{
 			ARSphericalView view = e.nextElement();
-			if(!view.visible)
-				continue;
+//			if(!view.visible)
+//				continue;
 			view.draw(c);
 		}
 		//Log.e("Spec","Took "+(System.currentTimeMillis() - time)+" seconds");
@@ -249,32 +256,42 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 			
 			Enumeration<ARSphericalView> e = arViews.elements();
 
+			if(arViews.size() == 0)
+				return;
+			
 			while(e.hasMoreElements())
 			{
 				//If we have a location, and the view has one, update it's data
-				
-				ARSphericalView view = e.nextElement();
-				if(l != null && view.location != null)
-				{
-					view.azimuth = l.bearingTo(view.location);
-					if(l.hasAltitude() && view.location.hasAltitude())
+				try{
+					ARSphericalView view = e.nextElement();
+					if(l != null && view.location != null)
 					{
-						view.inclination = (float) Math.atan(((view.location.getAltitude() - l.getAltitude()) / l.distanceTo(view.location)));
+						view.azimuth = l.bearingTo(view.location);
+						if(view.azimuth < 0)
+							view.azimuth = 360+view.azimuth;
+						if(l.hasAltitude() && view.location.hasAltitude())
+						{
+							view.inclination = (float) Math.atan(((view.location.getAltitude() - l.getAltitude()) / l.distanceTo(view.location)));
+						}
 					}
+	//				if(!isVisibleX(leftArm, rightArm, view.azimuth))
+	//				{
+	//					view.visible = false;
+	//					continue;
+	//				}
+	//				if(!isVisibleY(lowerArm, upperArm, view.inclination))
+	//				{
+	//					view.visible = false;
+	//					continue;
+	//				}
+					view.visible = true;
+					
+					view.layout((int)calcXvalue(leftArm, rightArm, view.azimuth), (int)calcYvalue(lowerArm, upperArm, view.inclination), view.getBottom(), view.getRight());
 				}
-//				if(!isVisibleX(leftArm, rightArm, view.azimuth))
-//				{
-//					view.visible = false;
-//					continue;
-//				}
-//				if(!isVisibleY(lowerArm, upperArm, view.inclination))
-//				{
-//					view.visible = false;
-//					continue;
-//				}
-				view.visible = true;
-				
-				view.layout((int)calcXvalue(leftArm, rightArm, view.azimuth), (int)calcYvalue(lowerArm, upperArm, view.inclination), view.getBottom(), view.getRight());
+				catch(Exception x)
+				{
+					Log.e("ArLayout", x.getMessage());
+				}
 			}
 			
 		}

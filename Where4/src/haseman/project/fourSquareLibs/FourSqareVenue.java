@@ -12,11 +12,12 @@ public class FourSqareVenue extends ARSphericalView
 	public FourSqareVenue(Context ctx)
 	{
 		super(ctx);
-		
+		inclination = 0;
 	}
 
 	public void draw(Canvas c)
 	{
+
 		p.setColor(Color.WHITE);
 		if(name != null)
 			c.drawText(name, getLeft(), getTop(), p);

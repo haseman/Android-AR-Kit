@@ -29,11 +29,10 @@ public class FourSquareClient
 	}
 	public Vector<FourSqareVenue> getVenuList(Location loc)
 	{
-		//10-28 18:19:50.908: ERROR/where4(3843): Url: http://api.foursquare.com/v1/venues?geolat=37.76299774646759&geolong=-122.41124510765076
 
 		Vector<FourSqareVenue> v = new Vector<FourSqareVenue>();
 		try{
-		URL url = new URL("http://api.foursquare.com/v1/venues?l=10&geolat="+loc.getLatitude()+"&geolong="+loc.getLongitude());
+		URL url = new URL("http://api.foursquare.com/v1/venues?l=5&geolat="+loc.getLatitude()+"&geolong="+loc.getLongitude());
 		Log.e("where4","Url: "+url.toString());
 		HttpURLConnection httpconn;
 		httpconn = (HttpURLConnection) url.openConnection();

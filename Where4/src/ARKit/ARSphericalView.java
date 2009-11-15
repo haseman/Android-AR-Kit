@@ -10,10 +10,10 @@ import android.view.View;
 
 public class ARSphericalView extends View
 {
-	public float azimuth; //Angle from north
-	public float distance; //Distance to object
-	public float inclination = -1; //angle off horizon.
-	public Location location;
+	public volatile float azimuth; //Angle from north
+	public volatile float distance; //Distance to object
+	public volatile float inclination = -1; //angle off horizon.
+	public volatile Location location;
 	
 	public volatile int x;
 	public volatile int y;
@@ -56,16 +56,7 @@ public class ARSphericalView extends View
 	}
 	public void draw(Canvas c)
 	{
-//		p.setColor(Color.WHITE);
-//		c.drawText("Hello", x, y, p);
-//		Log.i("LayoutStuff","X is:"+x);
-//		Log.i("LayoutStuff","Y is:"+y);
+
 	}
-	
-//	{
-//		super(ctx);
-//		this.distance = distance;
-//		//arctan of opposite/adjacent
-		
-	//}
+
 }
