@@ -91,9 +91,9 @@ public class ARLayout extends View implements LocationListener, SensorEventListe
 		if(evt.sensor.getType() == Sensor.TYPE_ORIENTATION)
 		{
 			float tmp = vals[0];
-			//tmp = tmp-90;
-			if(tmp < 0)
-				tmp = tmp+360;
+			tmp += 90;
+			if(tmp > 360)
+				tmp -= 360;
 			
 			direction =(float) ((tmp * kFilteringFactor) + (direction * (1.0 - kFilteringFactor)));
 			//direction = direction-90;
