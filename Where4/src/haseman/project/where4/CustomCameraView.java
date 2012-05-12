@@ -42,10 +42,10 @@ public class CustomCameraView extends SurfaceView
 
 		public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int w, int h)
 		{
-			Parameters params = camera.getParameters();
-			params.setPreviewSize(320, 480);
-			params.setPictureFormat(PixelFormat.JPEG);
-	        camera.setParameters(params);
+			//Parameters params = camera.getParameters();
+			//params.setPreviewSize(w, h);
+			//params.setPictureFormat(PixelFormat.JPEG);
+	        //camera.setParameters(params);
 	        camera.startPreview();
 		}
 
